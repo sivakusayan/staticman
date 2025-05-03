@@ -30,19 +30,25 @@ module.exports = async (repo, data) => {
     }
 
     if (review.state === 'merged') {
-      const bodyMatch = review.body.match(/(?:.*?)<!--staticman_notification:(.+?)-->(?:.*?)/i)
+        // Let's wait a bit before we send the email, as the deploy of the new website
+        // will take a while. It would be confusing to receive an email about a new comment
+        // when the comment has not shown up on the website yet.
+        // 10 minutes to deploy should be enough for the foreseeable future.
+        console.log("Received comment merge webhook event. Queueing mail send.")
+        setTimeout(async() => {
+              const bodyMatch = review.body.match(/(?:.*?)<!--staticman_notification:(.+?)-->(?:.*?)/i)
+              if (bodyMatch && (bodyMatch.length === 2)) {
+                try {
+                  const parsedBody = JSON.parse(bodyMatch[1])
+                  const staticman = await new Staticman(parsedBody.parameters)
 
-      if (bodyMatch && (bodyMatch.length === 2)) {
-        try {
-          const parsedBody = JSON.parse(bodyMatch[1])
-          const staticman = await new Staticman(parsedBody.parameters)
-
-          staticman.setConfigPath(parsedBody.configPath)
-          staticman.processMerge(parsedBody.fields, parsedBody.options)
-        } catch (err) {
-          return Promise.reject(err)
-        }
-      }
+                  staticman.setConfigPath(parsedBody.configPath)
+                  staticman.processMerge(parsedBody.fields, parsedBody.options)
+                } catch (err) {
+                    console.err("Something went wrong processing merge.", err);
+                }
+              }
+        }, 10 * 60 * 1000);
     }
 
     if (ua) {
