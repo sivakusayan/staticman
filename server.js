@@ -4,6 +4,7 @@ const express = require('express')
 const ExpressBrute = require('express-brute')
 const GithubWebHook = require('express-github-webhook')
 const objectPath = require('object-path')
+const { handleCommentHistoryGet } = require('./controllers/comments.js');
 
 class StaticmanAPI {
   constructor () {
@@ -13,7 +14,8 @@ class StaticmanAPI {
       auth: require('./controllers/auth'),
       handlePR: require('./controllers/handlePR'),
       home: require('./controllers/home'),
-      process: require('./controllers/process')
+      process: require('./controllers/process'),
+      getComments: handleCommentHistoryGet,
     }
 
     this.server = express()
@@ -32,7 +34,7 @@ class StaticmanAPI {
   initialiseBruteforceProtection () {
     const store = new ExpressBrute.MemoryStore()
 
-    this.bruteforce = new ExpressBrute(store)
+      this.bruteforce = new ExpressBrute(store, { freeRetries: 5 })
   }
 
   initialiseCORS () {
@@ -95,6 +97,15 @@ class StaticmanAPI {
       this.requireService(['github', 'gitlab']),
       this.controllers.auth
     )
+
+    // Route: oauth
+    this.server.get(
+        '/v:version/comment_history',
+      this.bruteforce.prevent,
+      this.requireApiVersion([2, 3]),
+      this.controllers.getComments
+    )
+
 
     // Route: root
     this.server.get(

@@ -29,6 +29,7 @@
     "@octokit/request": "^5.3.1",
     "@octokit/rest": "^16.35.0",
     "akismet": "^1.0.0",
+    "argon2": "^0.43.0",
     "body-parser": "^1.17.x",
     "bunyan-slack": "0.0.10",
     "convict": "^4.3.0",
@@ -49,6 +50,7 @@
     "request-promise": "^4.2.2",
     "sha1": "^1.1.1",
     "slug": "^0.9.3",
+    "sqlite3": "^5.1.7",
     "universal-analytics": "^0.4.2",
     "uuid": "^3.3.2"
   },
@@ -86,5 +88,6 @@
     "ignore": [
       "test/**/*"
     ]
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
